@@ -2,6 +2,8 @@
 --  I promise not to create any merge conflicts in this directory :)
 --
 -- See the kickstart.nvim README for more information
+---@module 'lazy'
+---@type LazySpec
 return {
   {
     'fei6409/log-highlight.nvim',
