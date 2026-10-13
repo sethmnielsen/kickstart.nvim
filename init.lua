@@ -116,6 +116,20 @@ vim.o.showmode = false
 --  See `:help 'clipboard'`
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
+-- Over SSH, copy to the local machine's clipboard with OSC 52 (tmux forwards
+-- it with set-clipboard on), but paste from Neovim's own register: OSC 52
+-- paste asks the terminal for its clipboard, which tmux doesn't pass through,
+-- so `p` would stall. Paste from the local clipboard with the terminal (Cmd+V).
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
+  local osc52 = require 'vim.ui.clipboard.osc52'
+  local function paste() return { vim.fn.split(vim.fn.getreg '', '\n'), vim.fn.getregtype '' } end
+  vim.g.clipboard = {
+    name = 'OSC 52 (copy only)',
+    copy = { ['+'] = osc52.copy '+', ['*'] = osc52.copy '*' },
+    paste = { ['+'] = paste, ['*'] = paste },
+  }
+end
+
 -- Enable break indent
 vim.o.breakindent = true
 
